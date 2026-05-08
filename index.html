@@ -4,7 +4,7 @@
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌿</text></svg>">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Relax Station · Relax Station </title>
+    <title>Relax Station · Relax Station</title>
     <style>
         :root {
             --bg:           #fdfaf5;
@@ -34,9 +34,13 @@
         .page { max-width: 520px; margin: 0 auto; }
 
         /* ── 標題 ── */
-        .page-header { margin-bottom: 28px; }
-        .page-header h1 { font-size: 1.5rem; font-weight: 700; color: var(--text-dark); }
-        .page-header p  { font-size: 0.85rem; color: var(--muted); margin-top: 4px; }
+        .page-header { margin-bottom: 28px; display: flex; flex-direction: column; gap: 4px; }
+        .page-header h1 {
+            font-size: 1.5rem; font-weight: 700; color: var(--text-dark);
+            display: flex; align-items: center; gap: 10px;
+        }
+        .page-header h1 .header-icon svg { display: block; }
+        .page-header p  { font-size: 0.85rem; color: var(--muted); }
 
         /* ── 通用卡片 ── */
         .card {
@@ -82,9 +86,15 @@
             border-radius: 12px;
             background: var(--bg);
             display: flex; align-items: center; justify-content: center;
-            font-size: 1.2rem; flex-shrink: 0;
+            flex-shrink: 0;
+            color: var(--muted);
+            transition: color 0.2s;
         }
-        .item-card.selected .item-icon { background: var(--primary-light); }
+        .item-icon svg { display: block; }
+        .item-card.selected .item-icon {
+            background: var(--primary-light);
+            color: var(--primary);
+        }
 
         .item-info { flex: 1; }
         .item-name { font-size: 0.9rem; font-weight: 600; color: var(--text-dark); }
@@ -104,14 +114,19 @@
             border: 1.5px solid #ddd;
             flex-shrink: 0;
             display: flex; align-items: center; justify-content: center;
-            font-size: 0.7rem; color: white;
             transition: all 0.2s;
         }
         .item-card.selected .check-dot {
             background: var(--primary);
             border-color: var(--primary);
         }
-        .item-card.selected .check-dot::after { content: "✓"; }
+        .item-card.selected .check-dot::after {
+            content: "";
+            display: block;
+            width: 10px; height: 10px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'/%3E%3C/svg%3E");
+            background-size: contain; background-repeat: no-repeat; background-position: center;
+        }
 
         /* ── 排序清單 ── */
         .order-item {
@@ -130,15 +145,21 @@
             display: flex; align-items: center; justify-content: center;
             margin-right: 10px; flex-shrink: 0;
         }
+        .order-icon {
+            display: flex; align-items: center;
+            margin-right: 8px; color: var(--muted); flex-shrink: 0;
+        }
+        .order-icon svg { display: block; }
         .order-controls { margin-left: auto; display: flex; gap: 4px; }
         .order-btn {
             width: 26px; height: 26px; border-radius: 8px;
             border: none; background: none; cursor: pointer;
-            color: var(--muted); font-size: 0.8rem;
+            color: var(--muted);
             display: flex; align-items: center; justify-content: center;
             transition: 0.15s;
         }
         .order-btn:hover { background: var(--primary-light); color: var(--primary); }
+        .order-btn svg { display: block; }
 
         /* ── 按鈕 ── */
         .btn {
@@ -166,11 +187,13 @@
 
         /* ── 收藏組合 play 標籤 ── */
         .play-badge {
+            display: flex; align-items: center; gap: 5px;
             font-size: 0.7rem; font-weight: 700;
             background: var(--primary); color: white;
-            padding: 3px 9px; border-radius: 20px;
+            padding: 4px 10px; border-radius: 20px;
             flex-shrink: 0;
         }
+        .play-badge svg { display: block; }
 
         /* ── 計時區（sticky 頂部） ── */
         #timer-ui {
@@ -246,38 +269,95 @@
 
         /* ── 慶祝橫幅 ── */
         #celebration {
-            display: none;
             position: fixed; top: 20px; left: 50%;
             transform: translateX(-50%);
             background: var(--break-dark);
             color: white; padding: 12px 28px;
             border-radius: 50px; z-index: 200;
             font-size: 0.9rem; white-space: nowrap;
-            animation: fadeDown 0.4s ease;
             box-shadow: 0 8px 24px rgba(109,191,128,0.35);
+            display: flex; align-items: center; gap: 8px;
+            opacity: 0; pointer-events: none;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            transform: translateX(-50%) translateY(-12px);
         }
-        @keyframes fadeDown {
-            from { opacity: 0; transform: translate(-50%, -16px); }
-            to   { opacity: 1; transform: translate(-50%, 0); }
+        #celebration.visible {
+            opacity: 1; pointer-events: auto;
+            transform: translateX(-50%) translateY(0);
         }
+
+        /* ── 自訂確認 Modal ── */
+        #confirm-modal {
+            display: none;
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.25);
+            z-index: 300;
+            align-items: center; justify-content: center;
+            backdrop-filter: blur(4px);
+        }
+        #confirm-modal.open { display: flex; }
+        .confirm-box {
+            background: var(--card);
+            border-radius: 24px;
+            padding: 28px 24px;
+            text-align: center;
+            max-width: 300px; width: 90%;
+            box-shadow: var(--shadow-lg);
+            animation: popIn 0.2s ease;
+        }
+        @keyframes popIn {
+            from { transform: scale(0.88); opacity: 0; }
+            to   { transform: scale(1);    opacity: 1; }
+        }
+        .confirm-box p { font-size: 0.95rem; color: var(--text-dark); margin-bottom: 20px; font-weight: 600; }
+        .confirm-box .confirm-sub { font-size: 0.8rem; color: var(--muted); font-weight: 400; margin-top: -12px; margin-bottom: 20px; }
+        .confirm-actions { display: flex; gap: 10px; }
+        .confirm-actions .btn { padding: 12px; }
+
 
         .hidden { display: none !important; }
 
-        /* ── 小工具 pill for 工具提示 ── */
-        .doing-pill {
-            display: inline-flex; align-items: center; gap: 4px;
-            background: var(--bg); border: 1px solid #ede9e4;
-            border-radius: 20px; font-size: 0.72rem; color: var(--text);
-            padding: 3px 10px; margin-bottom: 12px;
+        /* delete button in favorites */
+        .fav-delete-btn {
+            background: none; border: none; cursor: pointer;
+            color: var(--muted); flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center;
+            padding: 4px; border-radius: 8px;
+            transition: 0.15s;
         }
+        .fav-delete-btn:hover { background: #fff0f0; color: var(--primary); }
+        .fav-delete-btn svg { display: block; }
     </style>
 </head>
 <body>
 <div id="celebration"></div>
 
+<!-- 自訂確認 Modal -->
+<div id="confirm-modal">
+    <div class="confirm-box">
+        <p>確定要停止練習嗎？</p>
+        <p class="confirm-sub">目前進度將不會儲存</p>
+        <div class="confirm-actions">
+            <button class="btn btn-ghost" onclick="closeConfirm()">繼續練習</button>
+            <button class="btn btn-danger" onclick="confirmStop()">停止</button>
+        </div>
+    </div>
+</div>
+
 <div class="page">
     <div class="page-header">
-        <h1>🌿 Relax Station</h1>
+        <h1>
+            <span class="header-icon">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 22 Q12 12 20 5"/>
+                    <path d="M12 22 Q12 14 4 8"/>
+                    <path d="M12 22 L12 10"/>
+                    <path d="M20 5 Q14 5 12 10"/>
+                    <path d="M4 8 Q9 7 12 10"/>
+                </svg>
+            </span>
+            Relax Station
+        </h1>
         <p>選好部位，讓身體喘口氣</p>
     </div>
 
@@ -339,7 +419,7 @@
                 開始自選組合（<span id="select-count">0</span> 部位）
             </button>
             <button class="btn btn-ghost" style="margin-top:8px;" onclick="saveCurrentAsFavorite()">
-                💾 儲存此組合
+                儲存此組合
             </button>
         </div>
 
@@ -348,20 +428,120 @@
 
 <script>
     /* ══════════════════════════════════
+       線條風格 SVG 圖示
+    ══════════════════════════════════ */
+    const ICONS = {
+        neck: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="5.5" r="3.5"/>
+            <path d="M10 9 L9.5 13.5"/>
+            <path d="M14 9 L14.5 13.5"/>
+            <path d="M7 14.5 Q7 19 12 20 Q17 19 17 14.5"/>
+        </svg>`,
+        chest: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 7 L12 4 L19 7 L18 17 Q12 21 6 17 Z"/>
+            <line x1="12" y1="4" x2="12" y2="18"/>
+            <path d="M7 11 Q10 14 12 12 Q14 14 17 11"/>
+        </svg>`,
+        pectoralis_minor: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 7 L12 4 L19 7 L18 17 Q12 21 6 17 Z"/>
+            <path d="M9 8.5 Q7.5 12 9 15"/>
+            <path d="M15 8.5 Q16.5 12 15 15"/>
+        </svg>`,
+        rhomboid: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="4.5" r="3"/>
+            <path d="M9.5 7.5 L7 21"/>
+            <path d="M14.5 7.5 L17 21"/>
+            <line x1="9" y1="13" x2="15" y2="13"/>
+            <line x1="8.5" y1="18" x2="15.5" y2="18"/>
+        </svg>`,
+        waist: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 3 Q12 6.5 18 3"/>
+            <path d="M6 3 L5 12"/>
+            <path d="M18 3 L19 12"/>
+            <path d="M5 12 Q12 9 19 12"/>
+            <path d="M5 12 Q5 20.5 12 22 Q19 20.5 19 12"/>
+        </svg>`,
+        lumbars: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="2" x2="12" y2="22"/>
+            <rect x="9" y="4" width="6" height="4" rx="1.5"/>
+            <rect x="9" y="10" width="6" height="4" rx="1.5"/>
+            <rect x="9" y="16" width="6" height="4" rx="1.5"/>
+        </svg>`,
+        glute: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 5 Q3 14.5 12 16.5 Q21 14.5 21 5"/>
+            <path d="M3 5 Q7.5 2 12 4 Q16.5 2 21 5"/>
+            <line x1="12" y1="4" x2="12" y2="16.5"/>
+        </svg>`,
+        thigh_f: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M7.5 3 L16.5 3 Q17.5 12 15.5 21 L8.5 21 Q6.5 12 7.5 3"/>
+            <line x1="10.5" y1="3" x2="10.5" y2="21"/>
+            <line x1="13.5" y1="3" x2="13.5" y2="21"/>
+        </svg>`,
+        thigh_i: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 3 Q7.5 3 8.5 12 Q8 19.5 6.5 22"/>
+            <path d="M20 3 Q16.5 3 15.5 12 Q16 19.5 17.5 22"/>
+            <path d="M8.5 12 Q12 15.5 15.5 12"/>
+        </svg>`,
+        thigh_b: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M7.5 3 L16.5 3 Q17.5 12 15.5 21 L8.5 21 Q6.5 12 7.5 3"/>
+            <path d="M7.5 9.5 Q10.5 6.5 14 7.5 Q16.5 8.5 16.5 9.5"/>
+        </svg>`,
+        calf: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 2 Q8 9.5 8.5 15.5 Q9 20 11 22 L13 22 Q15 20 15.5 15.5 Q16 9.5 15 2"/>
+            <path d="M9 8 Q12 11 15 8"/>
+        </svg>`,
+        favorite: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="4" width="18" height="16" rx="3"/>
+            <line x1="7" y1="9" x2="17" y2="9"/>
+            <line x1="7" y1="13" x2="14" y2="13"/>
+        </svg>`,
+        play: `<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="none">
+            <polygon points="5,3 19,12 5,21"/>
+        </svg>`,
+        chevronUp: `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="18 15 12 9 6 15"/>
+        </svg>`,
+        chevronDown: `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9"/>
+        </svg>`,
+        trash: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="3 6 5 6 21 6"/>
+            <path d="M19 6 L18 20 Q18 21 17 21 L7 21 Q6 21 6 20 L5 6"/>
+            <path d="M10 11 L10 17 M14 11 L14 17"/>
+            <path d="M9 6 Q9 4 12 4 Q15 4 15 6"/>
+        </svg>`,
+        save: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 21 L5 21 Q4 21 3 20 L3 4 Q3 3 4 3 L16 3 L21 8 L21 20 Q21 21 20 21 Z"/>
+            <polyline points="17 21 17 13 7 13 7 21"/>
+            <polyline points="7 3 7 8 15 8"/>
+        </svg>`,
+        check: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"/>
+        </svg>`,
+        party: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5.8 11.3 L2 22 L13.2 18 Z"/>
+            <path d="M5.8 11.3 Q10 5 18 6 Q19 14 13.2 18"/>
+            <line x1="13" y1="5" x2="14" y2="3"/>
+            <line x1="17" y1="7" x2="19" y2="6"/>
+            <line x1="18" y1="11" x2="20" y2="11"/>
+        </svg>`,
+    };
+
+    /* ══════════════════════════════════
        資料
     ══════════════════════════════════ */
     const moveLib = [
-        { id:'neck',             name:'頸部放鬆',   muscle:'斜方肌',       tool:'按摩球 / 手', side:true,  emoji:'🧠' },
-        { id:'chest',            name:'胸部開展',   muscle:'胸大肌',       tool:'按摩球',      side:true,  emoji:'💪' },
-        { id:'pectoralis_minor', name:'胸小肌舒緩', muscle:'胸部深層',     tool:'按摩球',      side:true,  emoji:'🫁' },
-        { id:'rhomboid',         name:'菱形肌',     muscle:'上背夾骨',     tool:'按摩球',      side:true,  emoji:'🔷' },
-        { id:'waist',            name:'左右腰部',   muscle:'腰方肌 / 腰側', tool:'按摩球',      side:true,  emoji:'↔️' },
-        { id:'lumbars',          name:'下背舒緩',   muscle:'豎脊肌',       tool:'按摩球',      side:false, emoji:'🪨' },
-        { id:'glute',            name:'臀部放鬆',   muscle:'臀大肌 / 梨狀肌', tool:'按摩球',   side:true,  emoji:'🍑' },
-        { id:'thigh_f',          name:'大腿前側',   muscle:'股四頭肌',     tool:'滾筒',        side:true,  emoji:'🦵' },
-        { id:'thigh_i',          name:'大腿內側',   muscle:'內收肌群',     tool:'滾筒',        side:true,  emoji:'🔰' },
-        { id:'thigh_b',          name:'大腿後側',   muscle:'腿後肌群',     tool:'滾筒',        side:true,  emoji:'🦵' },
-        { id:'calf',             name:'小腿放鬆',   muscle:'腓腸肌',       tool:'滾筒 / 球',   side:true,  emoji:'🦶' },
+        { id:'neck',             name:'頸部放鬆',   muscle:'斜方肌',           tool:'按摩球 / 手', side:true  },
+        { id:'chest',            name:'胸部開展',   muscle:'胸大肌',           tool:'按摩球',      side:true  },
+        { id:'pectoralis_minor', name:'胸小肌舒緩', muscle:'胸部深層',         tool:'按摩球',      side:true  },
+        { id:'rhomboid',         name:'菱形肌',     muscle:'上背夾骨',         tool:'按摩球',      side:true  },
+        { id:'waist',            name:'左右腰部',   muscle:'腰方肌 / 腰側',    tool:'按摩球',      side:true  },
+        { id:'lumbars',          name:'下背舒緩',   muscle:'豎脊肌',           tool:'按摩球',      side:false },
+        { id:'glute',            name:'臀部放鬆',   muscle:'臀大肌 / 梨狀肌',  tool:'按摩球',      side:true  },
+        { id:'thigh_f',          name:'大腿前側',   muscle:'股四頭肌',         tool:'滾筒',        side:true  },
+        { id:'thigh_i',          name:'大腿內側',   muscle:'內收肌群',         tool:'滾筒',        side:true  },
+        { id:'thigh_b',          name:'大腿後側',   muscle:'腿後肌群',         tool:'滾筒',        side:true  },
+        { id:'calf',             name:'小腿放鬆',   muscle:'腓腸肌',           tool:'滾筒 / 球',   side:true  },
     ];
 
     let selectedIdsOrder = [];
@@ -370,9 +550,52 @@
     let timerId = null;
 
     /* ══════════════════════════════════
+       按鈕音效
+    ══════════════════════════════════ */
+    function playClick(type = 'primary') {
+        try {
+            const ctx = getCtx();
+            const osc = ctx.createOscillator();
+            const g   = ctx.createGain();
+            osc.connect(g); g.connect(ctx.destination);
+
+            if (type === 'primary') {
+                // 清脆輕快的「啵」聲
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(600, ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(900, ctx.currentTime + 0.05);
+                g.gain.setValueAtTime(0.25, ctx.currentTime);
+                g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.12);
+                osc.start(); osc.stop(ctx.currentTime + 0.13);
+            } else if (type === 'ghost') {
+                // 柔和的「tick」聲
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(400, ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(500, ctx.currentTime + 0.04);
+                g.gain.setValueAtTime(0.15, ctx.currentTime);
+                g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.1);
+                osc.start(); osc.stop(ctx.currentTime + 0.11);
+            } else if (type === 'danger') {
+                // 低沉的「咚」聲
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(280, ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(180, ctx.currentTime + 0.12);
+                g.gain.setValueAtTime(0.28, ctx.currentTime);
+                g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.18);
+                osc.start(); osc.stop(ctx.currentTime + 0.2);
+            } else if (type === 'select') {
+                // 選取時短促「嗒」聲
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(700, ctx.currentTime);
+                g.gain.setValueAtTime(0.12, ctx.currentTime);
+                g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.07);
+                osc.start(); osc.stop(ctx.currentTime + 0.08);
+            }
+        } catch(e) {}
+    }
+    /* ══════════════════════════════════
        音效（Web Audio API）
     ══════════════════════════════════ */
-    let audioCtx = null;
     function getCtx() { return audioCtx || (audioCtx = new (window.AudioContext || window.webkitAudioContext)()); }
     function playTone(freq, duration = 0.12, gain = 0.35) {
         try {
@@ -386,13 +609,10 @@
             osc.start(); osc.stop(ctx.currentTime + duration + 0.02);
         } catch(e) {}
     }
-    // 倒數提示（最後5秒）
     function playCountdown() { playTone(440, 0.08, 0.2); }
-    // 換動作完成音（輕快兩聲）
     function playNext() {
         playTone(523, 0.15); setTimeout(() => playTone(659, 0.2), 170);
     }
-    // 全部完成音（三聲上揚）
     function playFinish() {
         playTone(523, 0.18);
         setTimeout(() => playTone(659, 0.18), 200);
@@ -406,7 +626,7 @@
         const libUI = document.getElementById('move-library-ui');
         libUI.innerHTML = moveLib.map(m => `
             <div class="item-card" id="card-${m.id}" onclick="toggleSelect('${m.id}')">
-                <div class="item-icon">${m.emoji}</div>
+                <div class="item-icon">${ICONS[m.id] || ICONS.favorite}</div>
                 <div class="item-info">
                     <div class="item-name">${m.name}</div>
                     <div class="item-meta">${m.muscle} · ${m.side ? '左右分開' : '單次'}</div>
@@ -424,6 +644,7 @@
     function toggleSelect(id) {
         const i = selectedIdsOrder.indexOf(id);
         i > -1 ? selectedIdsOrder.splice(i,1) : selectedIdsOrder.push(id);
+        playClick('select');
         updateUISelection();
     }
 
@@ -437,13 +658,15 @@
 
         document.getElementById('sortable-list').innerHTML = selectedIdsOrder.map((id, idx) => {
             const m = moveLib.find(x => x.id === id);
+            const smallIcon = (ICONS[m.id] || '').replace(/width="22" height="22"/, 'width="16" height="16"');
             return `
                 <div class="order-item">
                     <div class="order-num">${idx+1}</div>
-                    <span>${m.emoji} ${m.name}</span>
+                    <span class="order-icon">${smallIcon}</span>
+                    <span>${m.name}</span>
                     <div class="order-controls">
-                        <button class="order-btn" onclick="moveItem(${idx},-1);event.stopPropagation()">▲</button>
-                        <button class="order-btn" onclick="moveItem(${idx}, 1);event.stopPropagation()">▼</button>
+                        <button class="order-btn" onclick="moveItem(${idx},-1);event.stopPropagation()" title="上移">${ICONS.chevronUp}</button>
+                        <button class="order-btn" onclick="moveItem(${idx}, 1);event.stopPropagation()" title="下移">${ICONS.chevronDown}</button>
                     </div>
                 </div>`;
         }).join('');
@@ -475,24 +698,27 @@
         const all  = [...defaults, ...user];
         document.getElementById('my-favorites-list').innerHTML = all.map((f,i) => `
             <div class="item-card" onclick="prepareQueueAndStart(['${f.ids.join("','")}'])">
-                <div class="item-icon">📦</div>
+                <div class="item-icon">${ICONS.favorite}</div>
                 <div class="item-info">
                     <div class="item-name">${f.name}</div>
                     <div class="item-meta">${f.ids.length} 部位 · 約 ${calcDuration(f.ids)} 分鐘</div>
                 </div>
-                ${i >= defaults.length ? `<button onclick="deleteFav(${i - defaults.length});event.stopPropagation()" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:0.8rem;flex-shrink:0;">✕</button>` : ''}
-                <span class="play-badge">▶ 開始</span>
+                ${i >= defaults.length
+                    ? `<button class="fav-delete-btn" onclick="deleteFav(${i - defaults.length});event.stopPropagation()" title="刪除">${ICONS.trash}</button>`
+                    : ''}
+                <span class="play-badge">${ICONS.play} 開始</span>
             </div>
         `).join('');
     }
 
     function saveCurrentAsFavorite() {
+        playClick('ghost');
         const name = prompt('組合名稱：', '我的日常組合');
         if (!name) return;
         const favs = JSON.parse(localStorage.getItem('fav_v2') || '[]');
         favs.push({ name, ids: [...selectedIdsOrder] });
         localStorage.setItem('fav_v2', JSON.stringify(favs));
-        showToast('✅ 組合已儲存！');
+        showToast(ICONS.check, '組合已儲存');
         renderFavorites();
     }
 
@@ -508,6 +734,7 @@
        建立動作佇列 & 啟動
     ══════════════════════════════════ */
     function prepareQueueAndStart(customIds = null) {
+        playClick('primary');
         const ids = customIds || selectedIdsOrder;
         currentQueue = [];
         ids.forEach(id => {
@@ -557,15 +784,11 @@
     }
 
     function updateTimerUI() {
-        // 數字
         document.getElementById('timer').innerText = timeLeft;
-        // 進度環（周長 ≈ 339.3）
         const pct = (totalTime - timeLeft) / totalTime;
         document.getElementById('ring-fill').style.strokeDashoffset = 339.3 * (1 - pct);
-        // 進度條
         const barPct = (currentIndex / currentQueue.length) * 100;
         document.getElementById('progress-bar').style.width = barPct + '%';
-        // 文字
         document.getElementById('stat-count').innerText = `動作 ${currentIndex+1} / ${currentQueue.length}`;
         const rem = (currentQueue.length - currentIndex - 1) * 60 + timeLeft;
         document.getElementById('stat-time').innerText  = `剩餘約 ${Math.floor(rem/60)} 分 ${rem%60} 秒`;
@@ -575,12 +798,17 @@
         if (timerId) {
             clearInterval(timerId); timerId = null;
             document.getElementById('play-btn').innerText = '繼續';
+            playClick('ghost');
         } else {
+            playClick('primary');
             startTimer();
         }
     }
 
-    function earlyFinish() { clearInterval(timerId); timerId = null; currentIndex++; runMove(); }
+    function earlyFinish() {
+        playClick('primary');
+        clearInterval(timerId); timerId = null; currentIndex++; runMove();
+    }
 
     function stopSession() {
         if (confirm('確定要停止練習嗎？')) location.reload();
@@ -588,18 +816,35 @@
 
     function finish() {
         playFinish();
-        showToast('🎉 完成了！你最漂亮！');
+        showToast(ICONS.party, '完成了！你最漂亮！');
         setTimeout(() => location.reload(), 3000);
     }
 
     /* ══════════════════════════════════
        工具
     ══════════════════════════════════ */
-    function showToast(text) {
+    function showToast(iconSvg, text) {
         const el = document.getElementById('celebration');
-        el.textContent = text;
-        el.style.display = 'block';
-        setTimeout(() => el.style.display = 'none', 3000);
+        el.innerHTML = `<span style="display:flex;align-items:center;">${iconSvg}</span>${text}`;
+        el.classList.add('visible');
+        clearTimeout(el._toastTimer);
+        el._toastTimer = setTimeout(() => el.classList.remove('visible'), 3000);
+    }
+
+    /* ══════════════════════════════════
+       自訂確認 Modal
+    ══════════════════════════════════ */
+    function stopSession() {
+        playClick('danger');
+        document.getElementById('confirm-modal').classList.add('open');
+    }
+    function closeConfirm() {
+        playClick('ghost');
+        document.getElementById('confirm-modal').classList.remove('open');
+    }
+    function confirmStop() {
+        playClick('danger');
+        location.reload();
     }
 
     /* ══════════════════════════════════

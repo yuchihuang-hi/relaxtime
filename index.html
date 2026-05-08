@@ -475,7 +475,7 @@
         const all  = [...defaults, ...user];
         document.getElementById('my-favorites-list').innerHTML = all.map((f,i) => `
             <div class="item-card" onclick="prepareQueueAndStart(['${f.ids.join("','")}'])">
-                <div class="item-icon">🗂️</div>
+                <div class="item-icon">📦</div>
                 <div class="item-info">
                     <div class="item-name">${f.name}</div>
                     <div class="item-meta">${f.ids.length} 部位 · 約 ${calcDuration(f.ids)} 分鐘</div>

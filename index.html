@@ -1,345 +1,639 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="zh-TW">
 <head>
-       <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡️</text></svg>">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌿</text></svg>">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Relax Station Pro - Notion Style</title>
-    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <title>Relax Station · 肌肉放鬆站</title>
     <style>
+        /* ── 設計語言：與番茄鐘完全一致 ── */
         :root {
-            --bg-color: #ffffff;
-            --text-color: #37352f;
-            --border-color: #e9e9e8;
-            --hover-color: #f1f1f0;
-            --accent-color: #eb5757; 
-            --progress-bg: #eeeeee;
+            --bg:           #fdfaf5;
+            --primary:      #e28e8e;
+            --primary-light:#f9d5d5;
+            --water:        #a2d2ff;
+            --break:        #b5e5c0;
+            --break-dark:   #6dbf80;
+            --card:         #ffffff;
+            --text:         #5d5d5d;
+            --text-dark:    #3a3a3a;
+            --muted:        #b0b0b0;
+            --shadow:       0 10px 30px rgba(0,0,0,0.05);
+            --shadow-lg:    0 15px 50px rgba(0,0,0,0.08);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; }
-        body { background-color: var(--bg-color); color: var(--text-color); padding: 20px; padding-bottom: 120px; }
-        .container { max-width: 500px; margin: 0 auto; }
-        
-        h1 { font-size: 1.6rem; margin-bottom: 24px; display: flex; align-items: center; gap: 10px; }
-        .section { margin-bottom: 32px; }
-        .section-title { font-size: 0.85rem; color: rgba(55, 53, 47, 0.5); font-weight: 700; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.05em; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
-        /* 卡片工具標籤樣式 */
-        .tool-tag {
-            font-size: 0.7rem;
-            font-weight: 600;
-            color: #444;
-            background: #fff;
-            border: 1px solid #ddd;
-            padding: 2px 6px;
-            border-radius: 4px;
-            margin-right: 8px;
-            display: inline-flex;
-            align-items: center;
-            gap: 3px;
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: "PingFang TC", "Microsoft JhengHei", "Noto Sans TC", sans-serif;
+            min-height: 100vh;
+            padding: 32px 20px 60px;
         }
 
+        .page { max-width: 520px; margin: 0 auto; }
+
+        /* ── 標題 ── */
+        .page-header { margin-bottom: 28px; }
+        .page-header h1 { font-size: 1.5rem; font-weight: 700; color: var(--text-dark); }
+        .page-header p  { font-size: 0.85rem; color: var(--muted); margin-top: 4px; }
+
+        /* ── 通用卡片 ── */
         .card {
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 14px;
+            background: var(--card);
+            border-radius: 24px;
+            box-shadow: var(--shadow);
+            padding: 20px;
+            margin-bottom: 16px;
+        }
+
+        /* ── 區塊標題 ── */
+        .section-label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--muted);
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+
+        /* ── 收藏 / 部位選取卡片 ── */
+        .item-card {
+            background: var(--card);
+            border: 1.5px solid #f0ede8;
+            border-radius: 16px;
+            padding: 14px 16px;
             margin-bottom: 8px;
             cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 14px;
             transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            position: relative;
         }
-        .card:hover { background-color: var(--hover-color); }
-        .card.selected { border: 2px solid var(--text-color); background-color: #fafafa; }
-        .card.selected::after { content: ""; font-family: "Phosphor"; position: absolute; right: 15px; font-weight: bold; }
+        .item-card:hover { background: #fdf7f2; border-color: var(--primary-light); }
+        .item-card.selected {
+            border-color: var(--primary);
+            background: #fff8f8;
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
 
-        /* 排序清單樣式 */
+        .item-icon {
+            width: 38px; height: 38px;
+            border-radius: 12px;
+            background: var(--bg);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.2rem; flex-shrink: 0;
+        }
+        .item-card.selected .item-icon { background: var(--primary-light); }
+
+        .item-info { flex: 1; }
+        .item-name { font-size: 0.9rem; font-weight: 600; color: var(--text-dark); }
+        .item-meta { font-size: 0.75rem; color: var(--muted); margin-top: 2px; }
+
+        .tool-pill {
+            font-size: 0.7rem; font-weight: 600;
+            background: var(--bg); color: var(--text);
+            border: 1px solid #e8e4df;
+            padding: 3px 8px; border-radius: 20px;
+            white-space: nowrap; flex-shrink: 0;
+        }
+
+        .check-dot {
+            width: 20px; height: 20px;
+            border-radius: 50%;
+            border: 1.5px solid #ddd;
+            flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.7rem; color: white;
+            transition: all 0.2s;
+        }
+        .item-card.selected .check-dot {
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+        .item-card.selected .check-dot::after { content: "✓"; }
+
+        /* ── 排序清單 ── */
         .order-item {
-            display: flex;
-            align-items: center;
-            background: #fff;
-            padding: 8px 12px;
-            border: 1px solid #eee;
-            border-radius: 6px;
-            margin-bottom: 5px;
-            font-size: 0.9rem;
+            display: flex; align-items: center;
+            background: var(--bg);
+            border: 1px solid #f0ede8;
+            border-radius: 12px;
+            padding: 10px 14px;
+            margin-bottom: 6px;
+            font-size: 0.85rem; color: var(--text-dark);
         }
-        .order-controls { margin-left: auto; display: flex; gap: 10px; }
-        .order-btn { cursor: pointer; opacity: 0.6; padding: 4px; }
-        .order-btn:hover { opacity: 1; background: #eee; border-radius: 4px; }
+        .order-num {
+            width: 22px; height: 22px; border-radius: 50%;
+            background: var(--primary-light); color: var(--primary);
+            font-size: 0.7rem; font-weight: 700;
+            display: flex; align-items: center; justify-content: center;
+            margin-right: 10px; flex-shrink: 0;
+        }
+        .order-controls { margin-left: auto; display: flex; gap: 4px; }
+        .order-btn {
+            width: 26px; height: 26px; border-radius: 8px;
+            border: none; background: none; cursor: pointer;
+            color: var(--muted); font-size: 0.8rem;
+            display: flex; align-items: center; justify-content: center;
+            transition: 0.15s;
+        }
+        .order-btn:hover { background: var(--primary-light); color: var(--primary); }
 
-        /* 剩餘 UI 保持一致... (省略重複的 CSS) */
-        #timer-ui { display: none; text-align: center; padding: 25px; border: 2px solid var(--text-color); border-radius: 12px; margin-bottom: 24px; background: white; position: sticky; top: 10px; z-index: 100; box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
-        .progress-container { width: 100%; height: 6px; background: var(--progress-bg); border-radius: 3px; margin: 15px 0; overflow: hidden; }
-        #progress-bar { width: 0%; height: 100%; background: var(--text-color); transition: width 0.3s ease; }
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; font-size: 0.8rem; color: #666; }
-        .time-num { font-size: 4.5rem; font-weight: 800; font-variant-numeric: tabular-nums; margin: 5px 0; }
-        .side-indicator { font-size: 1.1rem; font-weight: 800; color: white; background: var(--accent-color); padding: 2px 12px; border-radius: 20px; display: inline-block; margin-bottom: 10px; }
-        .btn { padding: 12px; border: 1px solid var(--text-color); background: white; border-radius: 8px; cursor: pointer; font-weight: 600; width: 100%; transition: 0.2s; }
-        .btn-black { background: var(--text-color); color: white; }
-        .btn-group { display: flex; gap: 8px; margin-top: 15px; }
-        .save-area { margin-top: 15px; padding: 15px; background: #f9f9f9; border-radius: 8px; border: 1px dashed #ccc; }
-        .illustration-box { background: #fafafa; border-radius: 12px; height: 180px; display: flex; justify-content: center; align-items: center; margin-bottom: 20px; border: 1px solid var(--border-color); }
-        .illustration-box svg { height: 90%; }
+        /* ── 按鈕 ── */
+        .btn {
+            width: 100%; padding: 14px;
+            border: none; border-radius: 16px;
+            font-family: inherit; font-size: 0.95rem; font-weight: 600;
+            cursor: pointer; transition: all 0.2s;
+        }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { opacity: 0.88; }
+        .btn-ghost {
+            background: none;
+            border: 1.5px solid var(--primary-light);
+            color: var(--primary);
+        }
+        .btn-ghost:hover { background: var(--primary-light); }
+        .btn-danger {
+            background: none;
+            border: 1.5px solid #f5c6c6;
+            color: var(--primary);
+        }
+        .btn-danger:hover { background: #fff0f0; }
+        .btn-group { display: flex; gap: 8px; margin-top: 12px; }
+        .btn-group .btn { margin: 0; }
+
+        /* ── 收藏組合 play 標籤 ── */
+        .play-badge {
+            font-size: 0.7rem; font-weight: 700;
+            background: var(--primary); color: white;
+            padding: 3px 9px; border-radius: 20px;
+            flex-shrink: 0;
+        }
+
+        /* ── 計時區（sticky 頂部） ── */
+        #timer-ui {
+            display: none;
+            background: var(--card);
+            border-radius: 28px;
+            box-shadow: var(--shadow-lg);
+            padding: 28px 24px;
+            margin-bottom: 20px;
+            position: sticky;
+            top: 12px;
+            z-index: 100;
+            text-align: center;
+        }
+
+        /* 進度環 */
+        .ring-wrap {
+            width: 140px; height: 140px;
+            position: relative;
+            margin: 0 auto 18px;
+        }
+        .ring-wrap svg { transform: rotate(-90deg); }
+        .ring-bg   { fill: none; stroke: var(--primary-light); stroke-width: 6; }
+        .ring-fill { fill: none; stroke: var(--primary); stroke-width: 6;
+                     stroke-linecap: round;
+                     stroke-dasharray: 339.3; stroke-dashoffset: 339.3;
+                     transition: stroke-dashoffset 0.8s ease; }
+        .ring-time {
+            position: absolute; inset: 0;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+        }
+        .ring-num { font-size: 2.8rem; font-weight: 300; color: var(--primary); line-height: 1; }
+        .ring-label { font-size: 0.7rem; color: var(--muted); margin-top: 2px; }
+
+        /* 動作名稱 & 側別 */
+        .side-pill {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            font-size: 0.75rem; font-weight: 700;
+            padding: 3px 12px; border-radius: 20px;
+            margin-bottom: 8px;
+        }
+        .move-name { font-size: 1.1rem; font-weight: 700; color: var(--text-dark); margin-bottom: 4px; }
+        .move-sub  { font-size: 0.8rem; color: var(--muted); margin-bottom: 16px; }
+
+        /* 進度條 */
+        .prog-bar-wrap {
+            width: 100%; height: 5px;
+            background: var(--primary-light);
+            border-radius: 99px; overflow: hidden;
+            margin-bottom: 8px;
+        }
+        #progress-bar {
+            height: 100%; width: 0%;
+            background: var(--primary);
+            border-radius: 99px;
+            transition: width 0.4s ease;
+        }
+        .prog-label {
+            display: flex; justify-content: space-between;
+            font-size: 0.72rem; color: var(--muted);
+            margin-bottom: 16px;
+        }
+
+        /* 插圖框 */
+        .illustration {
+            width: 90px; height: 140px;
+            margin: 0 auto 16px;
+        }
+        .illustration svg { width: 100%; height: 100%; }
+
+        /* ── 慶祝橫幅 ── */
+        #celebration {
+            display: none;
+            position: fixed; top: 20px; left: 50%;
+            transform: translateX(-50%);
+            background: var(--break-dark);
+            color: white; padding: 12px 28px;
+            border-radius: 50px; z-index: 200;
+            font-size: 0.9rem; white-space: nowrap;
+            animation: fadeDown 0.4s ease;
+            box-shadow: 0 8px 24px rgba(109,191,128,0.35);
+        }
+        @keyframes fadeDown {
+            from { opacity: 0; transform: translate(-50%, -16px); }
+            to   { opacity: 1; transform: translate(-50%, 0); }
+        }
+
         .hidden { display: none !important; }
-        .muscle-tag { font-size: 0.75rem; color: #666; background: #f0f0f0; padding: 2px 6px; border-radius: 4px; margin-top: 4px; display: inline-block; }
+
+        /* ── 小工具 pill for 工具提示 ── */
+        .doing-pill {
+            display: inline-flex; align-items: center; gap: 4px;
+            background: var(--bg); border: 1px solid #ede9e4;
+            border-radius: 20px; font-size: 0.72rem; color: var(--text);
+            padding: 3px 10px; margin-bottom: 12px;
+        }
     </style>
 </head>
 <body>
+<div id="celebration"></div>
 
-<div class="container">
-    <header>
-        <h1><i class="ph ph-circle-dashed"></i> 肌肉放鬆站</h1>
-    </header>
-
-    <div id="timer-ui">
-        <div class="stats-grid">
-            <div id="stat-count">剩餘動作: --</div>
-            <div id="stat-total-time">預計剩餘: --</div>
-        </div>
-        <div class="progress-container"><div id="progress-bar"></div></div>
-        <div class="illustration-box" id="illustration-viewer"></div>
-        <div id="side-label" class="side-indicator"></div>
-        <h2 id="current-move-name">動作名稱</h2>
-        <p id="current-muscle-info" style="font-size: 0.85rem; opacity: 0.6;"></p>
-        <div class="time-num" id="timer">60</div>
-        <div class="btn-group">
-            <button class="btn" onclick="toggleTimer()" id="play-btn">暫停</button>
-            <button class="btn" onclick="earlyFinish()" id="next-btn">提早完成</button>
-            <button class="btn" onclick="stopSession()" style="color:var(--accent-color); border-color:var(--accent-color)">停止</button>
-        </div>
+<div class="page">
+    <div class="page-header">
+        <h1>🌿 肌肉放鬆站</h1>
+        <p>選好部位，讓身體喘口氣</p>
     </div>
 
+    <!-- ══ 計時 UI ══ -->
+    <div id="timer-ui">
+
+        <div class="prog-bar-wrap"><div id="progress-bar"></div></div>
+        <div class="prog-label">
+            <span id="stat-count">動作 1 / 1</span>
+            <span id="stat-time">剩餘 -- 分</span>
+        </div>
+
+        <div class="illustration" id="illustration-viewer"></div>
+
+        <div id="side-label" class="side-pill"></div>
+        <div class="move-name" id="current-move-name">—</div>
+        <div class="move-sub"  id="current-muscle-info"></div>
+
+        <!-- 進度環計時 -->
+        <div class="ring-wrap">
+            <svg viewBox="0 0 114 114" width="140" height="140">
+                <circle class="ring-bg"   cx="57" cy="57" r="54"/>
+                <circle class="ring-fill" id="ring-fill" cx="57" cy="57" r="54"/>
+            </svg>
+            <div class="ring-time">
+                <div class="ring-num" id="timer">60</div>
+                <div class="ring-label">秒</div>
+            </div>
+        </div>
+
+        <div class="btn-group">
+            <button class="btn btn-ghost"   onclick="toggleTimer()" id="play-btn">暫停</button>
+            <button class="btn btn-primary" onclick="earlyFinish()">提早完成 ›</button>
+        </div>
+        <button class="btn btn-danger" style="margin-top:8px;" onclick="stopSession()">停止練習</button>
+    </div>
+
+    <!-- ══ 主畫面 ══ -->
     <div id="main-content">
-        <div class="section">
-            <p class="section-title">我的組合 (內建 & 收藏)</p>
+
+        <!-- 收藏組合 -->
+        <div class="card">
+            <div class="section-label">我的組合</div>
             <div id="my-favorites-list"></div>
         </div>
 
-        <div class="section">
-            <p class="section-title">選擇放鬆部位 (點擊選取)</p>
+        <!-- 自選部位 -->
+        <div class="card">
+            <div class="section-label">選擇放鬆部位</div>
             <div id="move-library-ui"></div>
-            
-            <div class="save-area" id="selection-panel" style="display:none;">
-                <p class="section-title" style="margin-top:0;">調整順序</p>
-                <div id="sortable-list" style="margin-bottom: 15px;"></div>
-                
-                <button class="btn btn-black" onclick="prepareQueueAndStart()">開始自選組合 (<span id="select-count">0</span>)</button>
-                <button class="btn" style="margin-top:8px;" onclick="saveCurrentAsFavorite()">儲存此組合</button>
-            </div>
         </div>
-    </div>
-</div>
+
+        <!-- 自選確認面板 -->
+        <div id="selection-panel" class="card" style="display:none;">
+            <div class="section-label">調整順序</div>
+            <div id="sortable-list" style="margin-bottom:16px;"></div>
+
+            <button class="btn btn-primary" onclick="prepareQueueAndStart()">
+                開始自選組合（<span id="select-count">0</span> 部位）
+            </button>
+            <button class="btn btn-ghost" style="margin-top:8px;" onclick="saveCurrentAsFavorite()">
+                💾 儲存此組合
+            </button>
+        </div>
+
+    </div><!-- /main-content -->
+</div><!-- /page -->
 
 <script>
+    /* ══════════════════════════════════
+       資料
+    ══════════════════════════════════ */
     const moveLib = [
-        { id: 'neck', name: '頸部放鬆', muscle: '斜方肌', tool: '按摩球/手', toolIcon: 'ph- كرة', side: true, icon: 'ph-circle-wavy' },
-        { id: 'chest', name: '胸部開展', muscle: '胸大肌', tool: '按摩球', toolIcon: 'ph- كرة', side: true, icon: 'ph-circle' },
-        { id: 'pectoralis_minor', name: '胸小肌舒緩', muscle: '胸部深層', tool: '按摩球', toolIcon: 'ph- كرة', side: true, icon: 'ph-dot-outline' },
-        { id: 'rhomboid', name: '菱形肌', muscle: '上背夾骨', tool: '按摩球', toolIcon: 'ph- كرة', side: true, icon: 'ph-circle-dashed' },
-        { id: 'waist', name: '左右腰部', muscle: '腰方肌/腰側', tool: '按摩球', toolIcon: 'ph- كرة', side: true, icon: 'ph-vignette' },
-        { id: 'lumbars', name: '下背舒緩', muscle: '豎脊肌', tool: '按摩球', toolIcon: 'ph- كرة', side: false, icon: 'ph-record' },
-        { id: 'glute', name: '臀部放鬆', muscle: '臀大肌/梨狀肌', tool: '按摩球', toolIcon: 'ph- كرة', side: true, icon: 'ph-circle-half' },
-        { id: 'thigh_f', name: '大腿前側', muscle: '股四頭肌', tool: '滾筒', toolIcon: 'ph-cylinder', side: true, icon: 'ph-circle-notch' },
-        { id: 'thigh_i', name: '大腿內側', muscle: '內收肌群', tool: '滾筒', toolIcon: 'ph-cylinder', side: true, icon: 'ph-aperture' },
-        { id: 'thigh_b', name: '大腿後側', muscle: '腿後肌群', tool: '滾筒', toolIcon: 'ph-cylinder', side: true, icon: 'ph-circle-half-tilt' },
-        { id: 'calf', name: '小腿放鬆', muscle: '腓腸肌', tool: '滾筒/球', toolIcon: 'ph-cylinder', side: true, icon: 'ph-sphere' }
+        { id:'neck',             name:'頸部放鬆',   muscle:'斜方肌',       tool:'按摩球 / 手', side:true,  emoji:'🧠' },
+        { id:'chest',            name:'胸部開展',   muscle:'胸大肌',       tool:'按摩球',      side:true,  emoji:'💪' },
+        { id:'pectoralis_minor', name:'胸小肌舒緩', muscle:'胸部深層',     tool:'按摩球',      side:true,  emoji:'🫁' },
+        { id:'rhomboid',         name:'菱形肌',     muscle:'上背夾骨',     tool:'按摩球',      side:true,  emoji:'🔷' },
+        { id:'waist',            name:'左右腰部',   muscle:'腰方肌 / 腰側', tool:'按摩球',      side:true,  emoji:'↔️' },
+        { id:'lumbars',          name:'下背舒緩',   muscle:'豎脊肌',       tool:'按摩球',      side:false, emoji:'🪨' },
+        { id:'glute',            name:'臀部放鬆',   muscle:'臀大肌 / 梨狀肌', tool:'按摩球',   side:true,  emoji:'🍑' },
+        { id:'thigh_f',          name:'大腿前側',   muscle:'股四頭肌',     tool:'滾筒',        side:true,  emoji:'🦵' },
+        { id:'thigh_i',          name:'大腿內側',   muscle:'內收肌群',     tool:'滾筒',        side:true,  emoji:'🔰' },
+        { id:'thigh_b',          name:'大腿後側',   muscle:'腿後肌群',     tool:'滾筒',        side:true,  emoji:'🦵' },
+        { id:'calf',             name:'小腿放鬆',   muscle:'腓腸肌',       tool:'滾筒 / 球',   side:true,  emoji:'🦶' },
     ];
 
-    let selectedIdsOrder = []; // 改用陣列儲存順序
-    let currentQueue = []; 
-    let currentIndex = 0;
-    let timeLeft = 60;
+    let selectedIdsOrder = [];
+    let currentQueue = [], currentIndex = 0;
+    let timeLeft = 60, totalTime = 60;
     let timerId = null;
 
+    /* ══════════════════════════════════
+       音效（Web Audio API）
+    ══════════════════════════════════ */
+    let audioCtx = null;
+    function getCtx() { return audioCtx || (audioCtx = new (window.AudioContext || window.webkitAudioContext)()); }
+    function playTone(freq, duration = 0.12, gain = 0.35) {
+        try {
+            const ctx = getCtx();
+            const osc = ctx.createOscillator();
+            const g   = ctx.createGain();
+            osc.connect(g); g.connect(ctx.destination);
+            osc.frequency.value = freq;
+            g.gain.setValueAtTime(gain, ctx.currentTime);
+            g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+            osc.start(); osc.stop(ctx.currentTime + duration + 0.02);
+        } catch(e) {}
+    }
+    // 倒數提示（最後5秒）
+    function playCountdown() { playTone(440, 0.08, 0.2); }
+    // 換動作完成音（輕快兩聲）
+    function playNext() {
+        playTone(523, 0.15); setTimeout(() => playTone(659, 0.2), 170);
+    }
+    // 全部完成音（三聲上揚）
+    function playFinish() {
+        playTone(523, 0.18);
+        setTimeout(() => playTone(659, 0.18), 200);
+        setTimeout(() => playTone(784, 0.35), 400);
+    }
+
+    /* ══════════════════════════════════
+       初始化
+    ══════════════════════════════════ */
     function init() {
         const libUI = document.getElementById('move-library-ui');
         libUI.innerHTML = moveLib.map(m => `
-            <div class="card" id="card-${m.id}" onclick="toggleSelect('${m.id}')">
-                <i class="ph ${m.icon}"></i>
-                <div class="card-info" style="flex:1">
-                    <div style="display:flex; align-items:center;">
-                        <span class="tool-tag"><i class="${m.tool.includes('滾筒')?'ph-cylinder':'ph-basketball'}"></i> ${m.tool}</span>
-                        <strong>${m.name}</strong>
-                    </div>
-                    <span class="muscle-tag">${m.muscle} | ${m.side ? '左右分開' : '單次'}</span>
+            <div class="item-card" id="card-${m.id}" onclick="toggleSelect('${m.id}')">
+                <div class="item-icon">${m.emoji}</div>
+                <div class="item-info">
+                    <div class="item-name">${m.name}</div>
+                    <div class="item-meta">${m.muscle} · ${m.side ? '左右分開' : '單次'}</div>
                 </div>
+                <span class="tool-pill">${m.tool}</span>
+                <div class="check-dot"></div>
             </div>
         `).join('');
         renderFavorites();
     }
 
+    /* ══════════════════════════════════
+       選取部位
+    ══════════════════════════════════ */
     function toggleSelect(id) {
-        const index = selectedIdsOrder.indexOf(id);
-        if (index > -1) {
-            selectedIdsOrder.splice(index, 1);
-        } else {
-            selectedIdsOrder.push(id);
-        }
+        const i = selectedIdsOrder.indexOf(id);
+        i > -1 ? selectedIdsOrder.splice(i,1) : selectedIdsOrder.push(id);
         updateUISelection();
     }
 
     function updateUISelection() {
-        // 更新卡片狀態
-        document.querySelectorAll('#move-library-ui .card').forEach(c => c.classList.remove('selected'));
-        selectedIdsOrder.forEach(sid => {
-            const el = document.getElementById(`card-${sid}`);
-            if(el) el.classList.add('selected');
-        });
-        
-        // 更新自選面板
+        document.querySelectorAll('#move-library-ui .item-card').forEach(c => c.classList.remove('selected'));
+        selectedIdsOrder.forEach(sid => document.getElementById('card-'+sid)?.classList.add('selected'));
+
         const panel = document.getElementById('selection-panel');
-        panel.style.display = selectedIdsOrder.length > 0 ? 'block' : 'none';
+        panel.style.display = selectedIdsOrder.length ? 'block' : 'none';
         document.getElementById('select-count').innerText = selectedIdsOrder.length;
 
-        // 渲染排序清單
-        const sortList = document.getElementById('sortable-list');
-        sortList.innerHTML = selectedIdsOrder.map((id, idx) => {
-            const move = moveLib.find(m => m.id === id);
+        document.getElementById('sortable-list').innerHTML = selectedIdsOrder.map((id, idx) => {
+            const m = moveLib.find(x => x.id === id);
             return `
                 <div class="order-item">
-                    <span>${idx + 1}. ${move.name}</span>
+                    <div class="order-num">${idx+1}</div>
+                    <span>${m.emoji} ${m.name}</span>
                     <div class="order-controls">
-                        <i class="ph ph-caret-up order-btn" onclick="moveItem(${idx}, -1); event.stopPropagation()"></i>
-                        <i class="ph ph-caret-down order-btn" onclick="moveItem(${idx}, 1); event.stopPropagation()"></i>
+                        <button class="order-btn" onclick="moveItem(${idx},-1);event.stopPropagation()">▲</button>
+                        <button class="order-btn" onclick="moveItem(${idx}, 1);event.stopPropagation()">▼</button>
                     </div>
-                </div>
-            `;
+                </div>`;
         }).join('');
     }
 
-    function moveItem(idx, direction) {
-        const newIdx = idx + direction;
-        if (newIdx < 0 || newIdx >= selectedIdsOrder.length) return;
-        const temp = selectedIdsOrder[idx];
-        selectedIdsOrder[idx] = selectedIdsOrder[newIdx];
-        selectedIdsOrder[newIdx] = temp;
+    function moveItem(idx, dir) {
+        const ni = idx + dir;
+        if (ni < 0 || ni >= selectedIdsOrder.length) return;
+        [selectedIdsOrder[idx], selectedIdsOrder[ni]] = [selectedIdsOrder[ni], selectedIdsOrder[idx]];
         updateUISelection();
     }
 
+    /* ══════════════════════════════════
+       收藏組合
+    ══════════════════════════════════ */
+    function calcDuration(ids) {
+        return ids.reduce((s, id) => {
+            const m = moveLib.find(x => x.id === id);
+            return s + (m ? (m.side ? 2 : 1) : 0);
+        }, 0);
+    }
+
+    function renderFavorites() {
+        const defaults = [
+            { name:'上肢舒緩', ids:['neck','chest','pectoralis_minor','rhomboid','waist','lumbars'] },
+            { name:'下肢舒緩', ids:['glute','thigh_f','thigh_i','calf'] },
+        ];
+        const user = JSON.parse(localStorage.getItem('fav_v2') || '[]');
+        const all  = [...defaults, ...user];
+        document.getElementById('my-favorites-list').innerHTML = all.map((f,i) => `
+            <div class="item-card" onclick="prepareQueueAndStart(['${f.ids.join("','")}'])">
+                <div class="item-icon">🗂️</div>
+                <div class="item-info">
+                    <div class="item-name">${f.name}</div>
+                    <div class="item-meta">${f.ids.length} 部位 · 約 ${calcDuration(f.ids)} 分鐘</div>
+                </div>
+                ${i >= defaults.length ? `<button onclick="deleteFav(${i - defaults.length});event.stopPropagation()" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:0.8rem;flex-shrink:0;">✕</button>` : ''}
+                <span class="play-badge">▶ 開始</span>
+            </div>
+        `).join('');
+    }
+
+    function saveCurrentAsFavorite() {
+        const name = prompt('組合名稱：', '我的日常組合');
+        if (!name) return;
+        const favs = JSON.parse(localStorage.getItem('fav_v2') || '[]');
+        favs.push({ name, ids: [...selectedIdsOrder] });
+        localStorage.setItem('fav_v2', JSON.stringify(favs));
+        showToast('✅ 組合已儲存！');
+        renderFavorites();
+    }
+
+    function deleteFav(idx) {
+        if (!confirm('刪除此組合？')) return;
+        const favs = JSON.parse(localStorage.getItem('fav_v2') || '[]');
+        favs.splice(idx, 1);
+        localStorage.setItem('fav_v2', JSON.stringify(favs));
+        renderFavorites();
+    }
+
+    /* ══════════════════════════════════
+       建立動作佇列 & 啟動
+    ══════════════════════════════════ */
     function prepareQueueAndStart(customIds = null) {
         const ids = customIds || selectedIdsOrder;
         currentQueue = [];
-        
         ids.forEach(id => {
-            const move = moveLib.find(m => m.id === id);
-            if (move) {
-                if (move.side) {
-                    currentQueue.push({ ...move, label: '左側' });
-                    currentQueue.push({ ...move, label: '右側' });
-                } else {
-                    currentQueue.push({ ...move, label: '雙側/中央' });
-                }
+            const m = moveLib.find(x => x.id === id);
+            if (!m) return;
+            if (m.side) {
+                currentQueue.push({ ...m, label:'左側' });
+                currentQueue.push({ ...m, label:'右側' });
+            } else {
+                currentQueue.push({ ...m, label:'中央' });
             }
         });
-
         currentIndex = 0;
         document.getElementById('main-content').classList.add('hidden');
         document.getElementById('timer-ui').style.display = 'block';
         runMove();
     }
 
-    // --- 以下為原始邏輯核心，保持不變以維持穩定性 ---
-
+    /* ══════════════════════════════════
+       計時核心
+    ══════════════════════════════════ */
     function runMove() {
         if (currentIndex >= currentQueue.length) return finish();
-        const move = currentQueue[currentIndex];
-        document.getElementById('current-move-name').innerText = move.name;
-        document.getElementById('side-label').innerText = move.label;
-        document.getElementById('side-label').style.display = move.label ? 'inline-block' : 'none';
-        document.getElementById('current-muscle-info').innerText = `${move.muscle} | 工具：${move.tool}`;
-        document.getElementById('illustration-viewer').innerHTML = bodySvg(move.id);
-        timeLeft = 60;
+        const m = currentQueue[currentIndex];
+        document.getElementById('current-move-name').innerText  = m.name;
+        document.getElementById('current-muscle-info').innerText = `${m.muscle} · 工具：${m.tool}`;
+        document.getElementById('side-label').innerText         = m.label;
+        document.getElementById('illustration-viewer').innerHTML = bodySvg(m.id);
+        timeLeft = totalTime = 60;
         updateTimerUI();
         startTimer();
     }
 
     function startTimer() {
         clearInterval(timerId);
+        document.getElementById('play-btn').innerText = '暫停';
         timerId = setInterval(() => {
             timeLeft--;
-            if (timeLeft <= 5 && timeLeft > 0) playBeep(440);
-            if (timeLeft <= 0) {
-                playBeep(880);
-                clearInterval(timerId);
-                setTimeout(() => { currentIndex++; runMove(); }, 1000);
-            }
+            if (timeLeft <= 5 && timeLeft > 0) playCountdown();
             updateTimerUI();
+            if (timeLeft <= 0) {
+                clearInterval(timerId); timerId = null;
+                playNext();
+                setTimeout(() => { currentIndex++; runMove(); }, 900);
+            }
         }, 1000);
     }
 
     function updateTimerUI() {
+        // 數字
         document.getElementById('timer').innerText = timeLeft;
-        const progress = (currentIndex / currentQueue.length) * 100;
-        document.getElementById('progress-bar').style.width = `${progress}%`;
-        document.getElementById('stat-count').innerText = `進度: ${currentIndex + 1} / ${currentQueue.length}`;
-        const totalSec = (currentQueue.length - currentIndex - 1) * 60 + timeLeft;
-        document.getElementById('stat-total-time').innerText = `剩餘約 ${Math.floor(totalSec/60)} 分 ${totalSec%60} 秒`;
+        // 進度環（周長 ≈ 339.3）
+        const pct = (totalTime - timeLeft) / totalTime;
+        document.getElementById('ring-fill').style.strokeDashoffset = 339.3 * (1 - pct);
+        // 進度條
+        const barPct = (currentIndex / currentQueue.length) * 100;
+        document.getElementById('progress-bar').style.width = barPct + '%';
+        // 文字
+        document.getElementById('stat-count').innerText = `動作 ${currentIndex+1} / ${currentQueue.length}`;
+        const rem = (currentQueue.length - currentIndex - 1) * 60 + timeLeft;
+        document.getElementById('stat-time').innerText  = `剩餘約 ${Math.floor(rem/60)} 分 ${rem%60} 秒`;
     }
 
-    function earlyFinish() { clearInterval(timerId); currentIndex++; runMove(); }
-    function toggleTimer() { 
-        if (timerId) { clearInterval(timerId); timerId = null; document.getElementById('play-btn').innerText = '繼續'; } 
-        else { startTimer(); document.getElementById('play-btn').innerText = '暫停'; }
-    }
-    function stopSession() { if(confirm("要結束練習嗎？")) location.reload(); }
-    function finish() { alert("結束了！你最漂亮！"); location.reload(); }
-    function playBeep(f){ try{const c=new(window.AudioContext||window.webkitAudioContext)();const o=c.createOscillator();const g=c.createGain();o.connect(g);g.connect(c.destination);o.frequency.value=f;o.start();g.gain.exponentialRampToValueAtTime(0.00001,c.currentTime+0.1);setTimeout(()=>{o.stop();c.close()},150)}catch(e){}}
-
-    function calculateTotalTime(ids) {
-        let count = 0;
-        ids.forEach(id => { const move = moveLib.find(m => m.id === id); if(move) count += (move.side ? 2 : 1); });
-        return count;
+    function toggleTimer() {
+        if (timerId) {
+            clearInterval(timerId); timerId = null;
+            document.getElementById('play-btn').innerText = '繼續';
+        } else {
+            startTimer();
+        }
     }
 
-    function renderFavorites() {
-        const defaultFavs = [
-            { name: '上肢組合', ids: ['neck', 'chest', 'pectoralis_minor', 'rhomboid', 'waist', 'lumbars'] },
-            { name: '下肢組合', ids: ['glute', 'thigh_f', 'thigh_i', 'calf'] }
-        ];
-        const userFavs = JSON.parse(localStorage.getItem('fav_v2') || '[]');
-        const allFavs = [...defaultFavs, ...userFavs];
-        document.getElementById('my-favorites-list').innerHTML = allFavs.map(f => `
-            <div class="card" onclick="prepareQueueAndStart(['${f.ids.join("','")}'])">
-                <i class="ph ph-play-circle" style="color:var(--accent-color)"></i>
-                <div class="card-info">
-                    <div>${f.name}</div>
-                    <span class="muscle-tag">${f.ids.length} 部位 | 約 ${calculateTotalTime(f.ids)} 分鐘</span>
-                </div>
-            </div>
-        `).join('');
+    function earlyFinish() { clearInterval(timerId); timerId = null; currentIndex++; runMove(); }
+
+    function stopSession() {
+        if (confirm('確定要停止練習嗎？')) location.reload();
     }
 
-    function saveCurrentAsFavorite() {
-        const name = prompt("組合名稱：", "我的日常組合");
-        if (!name) return;
-        const favs = JSON.parse(localStorage.getItem('fav_v2') || '[]');
-        favs.push({ name, ids: [...selectedIdsOrder] });
-        localStorage.setItem('fav_v2', JSON.stringify(favs));
-        location.reload();
+    function finish() {
+        playFinish();
+        showToast('🎉 完成了！你最漂亮！');
+        setTimeout(() => location.reload(), 3000);
     }
 
+    /* ══════════════════════════════════
+       工具
+    ══════════════════════════════════ */
+    function showToast(text) {
+        const el = document.getElementById('celebration');
+        el.textContent = text;
+        el.style.display = 'block';
+        setTimeout(() => el.style.display = 'none', 3000);
+    }
+
+    /* ══════════════════════════════════
+       人體插圖
+    ══════════════════════════════════ */
     const bodySvg = (part) => {
-        const highlights = {
-            'neck': '<path d="M40 35 Q50 45 60 35" stroke="var(--accent-color)" stroke-width="4" fill="none" />',
-            'chest': '<circle cx="35" cy="55" r="6" fill="var(--accent-color)" /><circle cx="65" cy="55" r="6" fill="var(--accent-color)" />',
-            'pectoralis_minor': '<circle cx="32" cy="48" r="4" fill="var(--accent-color)" /><circle cx="68" cy="48" r="4" fill="var(--accent-color)" />',
-            'rhomboid': '<path d="M40 55 L50 70 L60 55" stroke="var(--accent-color)" stroke-width="5" fill="none" />',
-            'waist': '<rect x="30" y="85" width="8" height="15" fill="var(--accent-color)" /><rect x="62" y="85" width="8" height="15" fill="var(--accent-color)" />',
-            'lumbars': '<rect x="42" y="90" width="16" height="15" fill="var(--accent-color)" />',
-            'glute': '<circle cx="40" cy="115" r="10" fill="var(--accent-color)" /><circle cx="60" cy="115" r="10" fill="var(--accent-color)" />',
-            'thigh_f': '<ellipse cx="40" cy="140" rx="8" ry="15" fill="var(--accent-color)" /><ellipse cx="60" cy="140" rx="8" ry="15" fill="var(--accent-color)" />',
-            'thigh_i': '<ellipse cx="45" cy="145" rx="5" ry="12" fill="var(--accent-color)" /><ellipse cx="55" cy="145" rx="5" ry="12" fill="var(--accent-color)" />',
-            'thigh_b': '<ellipse cx="40" cy="150" rx="8" ry="18" fill="rgba(235, 87, 87, 0.4)" />',
-            'calf': '<ellipse cx="37" cy="180" rx="5" ry="12" fill="var(--accent-color)" /><ellipse cx="63" cy="180" rx="5" ry="12" fill="var(--accent-color)" />'
+        const H = {
+            neck:             `<ellipse cx="50" cy="38" rx="8" ry="5" fill="var(--primary)" opacity=".7"/>`,
+            chest:            `<ellipse cx="36" cy="60" rx="7" ry="5" fill="var(--primary)" opacity=".7"/><ellipse cx="64" cy="60" rx="7" ry="5" fill="var(--primary)" opacity=".7"/>`,
+            pectoralis_minor: `<ellipse cx="36" cy="53" rx="5" ry="4" fill="var(--primary)" opacity=".7"/><ellipse cx="64" cy="53" rx="5" ry="4" fill="var(--primary)" opacity=".7"/>`,
+            rhomboid:         `<ellipse cx="43" cy="66" rx="6" ry="7" fill="var(--primary)" opacity=".7"/><ellipse cx="57" cy="66" rx="6" ry="7" fill="var(--primary)" opacity=".7"/>`,
+            waist:            `<ellipse cx="30" cy="92" rx="6" ry="8" fill="var(--primary)" opacity=".7"/><ellipse cx="70" cy="92" rx="6" ry="8" fill="var(--primary)" opacity=".7"/>`,
+            lumbars:          `<ellipse cx="50" cy="96" rx="10" ry="7" fill="var(--primary)" opacity=".7"/>`,
+            glute:            `<ellipse cx="38" cy="120" rx="10" ry="9" fill="var(--primary)" opacity=".7"/><ellipse cx="62" cy="120" rx="10" ry="9" fill="var(--primary)" opacity=".7"/>`,
+            thigh_f:          `<ellipse cx="38" cy="148" rx="8" ry="16" fill="var(--primary)" opacity=".6"/>  <ellipse cx="62" cy="148" rx="8" ry="16" fill="var(--primary)" opacity=".6"/>`,
+            thigh_i:          `<ellipse cx="44" cy="150" rx="5" ry="13" fill="var(--primary)" opacity=".65"/><ellipse cx="56" cy="150" rx="5" ry="13" fill="var(--primary)" opacity=".65"/>`,
+            thigh_b:          `<ellipse cx="38" cy="152" rx="8" ry="16" fill="var(--primary)" opacity=".4"/>  <ellipse cx="62" cy="152" rx="8" ry="16" fill="var(--primary)" opacity=".4"/>`,
+            calf:             `<ellipse cx="37" cy="186" rx="5" ry="12" fill="var(--primary)" opacity=".7"/>  <ellipse cx="63" cy="186" rx="5" ry="12" fill="var(--primary)" opacity=".7"/>`,
         };
-        return `<svg viewBox="0 0 100 220" xmlns="http://www.w3.org/2000/svg"><g stroke="#37352f" stroke-width="2" fill="none" stroke-linecap="round"><circle cx="50" cy="25" r="12" /> <path d="M50 37 L50 110" /> <path d="M50 45 L25 80" /> <path d="M50 45 L75 80" /> <path d="M50 110 L35 200" /> <path d="M50 110 L65 200" /> </g>${highlights[part] || ''}</svg>`;
+        return `<svg viewBox="0 0 100 220" xmlns="http://www.w3.org/2000/svg">
+            <g stroke="#c0bbb5" stroke-width="2.5" fill="#f5f2ee" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="50" cy="26" r="11"/>
+                <path d="M50 37 L50 108"/>
+                <path d="M50 48 L24 82 L20 100"/>
+                <path d="M50 48 L76 82 L80 100"/>
+                <path d="M50 108 L38 205"/>
+                <path d="M50 108 L62 205"/>
+            </g>
+            ${H[part] || ''}
+        </svg>`;
     };
 
     init();
 </script>
-
 </body>
 </html>
